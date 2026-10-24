@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { AlertTriangleIcon, CheckIcon, InfoIcon, LockIcon } from "@/components/icons";
 
 export function OrderActions({
   orderId,
@@ -52,31 +53,82 @@ export function OrderActions({
   }
 
   return (
-    <div className="card space-y-4">
-      <h2 className="font-semibold">Unlock voting — $5</h2>
-      {returnStatus === "succeeded" && (
-        <p className="text-sm text-muted">
-          Checkout finished. Waiting for Whop to confirm the payment server-side… refresh in a few seconds.
+    <section className="card space-y-5" aria-labelledby="unlock-heading">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="eyebrow">Step 2 · Checkout</p>
+          <h2 id="unlock-heading" className="mt-1 text-lg font-semibold">
+            Unlock voting — $5
+          </h2>
+        </div>
+        <p className="font-display text-3xl font-bold tabular-nums">
+          $5<span className="ml-1 text-sm font-medium text-muted">once</span>
         </p>
+      </div>
+
+      <ul className="space-y-2 text-sm">
+        {["Public voting link for participants", "Borda-count ranking & Build This First pick", "One-line reasons from every voter"].map((t) => (
+          <li key={t} className="flex items-center gap-2">
+            <CheckIcon size={16} className="shrink-0 text-success" />
+            {t}
+          </li>
+        ))}
+      </ul>
+
+      {returnStatus === "succeeded" && (
+        <div className="flex items-start gap-2 rounded-xl bg-accent-soft p-3 text-sm text-accent-soft-fg" role="status">
+          <InfoIcon size={16} className="mt-0.5 shrink-0" />
+          <p>Checkout finished. Waiting for Whop to confirm the payment server-side… refresh in a few seconds.</p>
+        </div>
       )}
-      {returnStatus === "failed" && <p className="text-sm text-red-600">The payment failed. You can try again.</p>}
-      <button className="btn" onClick={checkout} disabled={busy || !checkoutAvailable}>
-        Pay $5 with Whop
-      </button>
-      {!checkoutAvailable && <p className="text-sm text-muted">Checkout isn&apos;t configured on this deployment yet.</p>}
+      {returnStatus === "failed" && (
+        <div className="flex items-start gap-2 rounded-xl bg-danger-soft p-3 text-sm text-danger" role="alert">
+          <AlertTriangleIcon size={16} className="mt-0.5 shrink-0" />
+          <p>The payment failed. You can try again.</p>
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <button className="btn btn-lg w-full" onClick={checkout} disabled={busy || !checkoutAvailable}>
+          <LockIcon size={16} />
+          Pay $5 with Whop
+        </button>
+        {checkoutAvailable ? (
+          <p className="text-center text-xs text-muted">You&apos;ll be redirected to Whop&apos;s secure checkout.</p>
+        ) : (
+          <p className="text-sm text-muted">Checkout isn&apos;t configured on this deployment yet.</p>
+        )}
+      </div>
 
       {demoAvailable && (
-        <form onSubmit={demoUnlock} className="space-y-2 border-t border-border pt-4">
+        <form onSubmit={demoUnlock} className="space-y-2.5 border-t border-border pt-5">
+          <p className="eyebrow">Judge demo</p>
           <p className="text-sm text-muted">Judges: enter the demo access code to unlock without paying (marked as a test order).</p>
           <div className="flex gap-2">
-            <input className="input" type="password" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Demo access code" />
-            <button className="btn-ghost" disabled={busy || !code}>
+            <label htmlFor="demo-code" className="sr-only">
+              Demo access code
+            </label>
+            <input
+              id="demo-code"
+              className="input"
+              type="password"
+              autoComplete="off"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Demo access code"
+            />
+            <button className="btn-ghost shrink-0" disabled={busy || !code}>
               Unlock
             </button>
           </div>
         </form>
       )}
-      {error && <p className="text-sm text-red-600">{error}</p>}
-    </div>
+      {error && (
+        <p role="alert" className="flex items-start gap-2 text-sm text-danger">
+          <AlertTriangleIcon size={16} className="mt-0.5 shrink-0" />
+          {error}
+        </p>
+      )}
+    </section>
   );
 }

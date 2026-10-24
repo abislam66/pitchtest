@@ -114,6 +114,9 @@ describe("checkout route", () => {
     orders.getOrder.mockResolvedValue({ id: ORDER_ID, status: "test" });
     expect((await post({ orderId: ORDER_ID })).status).toBe(409);
     expect((await post({ orderId: "nope" })).status).toBe(400);
+    vi.stubEnv("WHOP_WEBHOOK_SECRET", "");
+    expect((await post({ orderId: ORDER_ID })).status).toBe(503);
+    vi.stubEnv("WHOP_WEBHOOK_SECRET", SECRET);
     vi.stubEnv("WHOP_PLAN_ID", "");
     expect((await post({ orderId: ORDER_ID })).status).toBe(503);
   });

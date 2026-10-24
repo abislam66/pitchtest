@@ -34,7 +34,8 @@ export const env = {
   get teracCallbackUrl() {
     return process.env.TERAC_CALLBACK_URL || null;
   },
+  /** Checkout is offered only when the webhook can confirm payments, so nobody pays into a dead end. */
   get whopConfigured() {
-    return Boolean(process.env.WHOP_API_KEY && process.env.WHOP_PLAN_ID);
+    return Boolean(process.env.WHOP_API_KEY && process.env.WHOP_PLAN_ID && process.env.WHOP_WEBHOOK_SECRET);
   },
 };
